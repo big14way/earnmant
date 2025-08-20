@@ -185,8 +185,9 @@ export function useInvestmentOpportunities() {
           console.log(`📋 Invoice ${id} details:`, details);
 
           if (details) {
-            // Handle amount as either string or number
-            const amountValue = typeof details.amount === 'string' ? details.amount : details.amount?.toString() || '0';
+            // Handle amount as either string or number  
+            const detailsAmount = (details as any).amount;
+            const amountValue = typeof detailsAmount === 'string' ? detailsAmount : String(detailsAmount || '0');
             const amount = parseFloat(amountValue);
             const targetFunding = calculateTargetFunding(amount.toString());
             const aprBasisPoints = calculateAPR(35); // Default risk score for blockchain invoices
@@ -194,15 +195,15 @@ export function useInvestmentOpportunities() {
             blockchainOpportunities.push({
               id: `blockchain-${id}`,
               invoiceId: id.toString(),
-              supplier: details.supplier || 'Unknown',
-              buyer: details.buyer || 'Unknown Buyer',
+              supplier: (details as any).supplier || 'Unknown',
+              buyer: (details as any).buyer || 'Unknown Buyer',
               amount: amount.toFixed(2),
-              commodity: details.commodity || 'Trade Finance',
-              supplierCountry: details.supplierCountry || 'Unknown',
-              buyerCountry: details.buyerCountry || 'Unknown',
-              exporterName: details.exporterName || 'Unknown Exporter',
-              buyerName: details.buyerName || 'Unknown Buyer',
-              dueDate: details.dueDate || Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60),
+              commodity: (details as any).commodity || 'Trade Finance',
+              supplierCountry: (details as any).supplierCountry || 'Unknown',
+              buyerCountry: (details as any).buyerCountry || 'Unknown',
+              exporterName: (details as any).exporterName || 'Unknown Exporter',
+              buyerName: (details as any).buyerName || 'Unknown Buyer',
+              dueDate: (details as any).dueDate || Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60),
               riskScore: 35, // Default risk score
               creditRating: 'B+', // Default credit rating for blockchain invoices
               aprBasisPoints,

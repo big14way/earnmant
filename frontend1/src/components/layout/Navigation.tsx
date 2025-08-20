@@ -6,7 +6,7 @@ import { HybridParaConnectButton } from '../wallet/HybridParaConnectButton';
 import { ParaWalletConnectKitButton } from '../wallet/ParaWalletConnectKitButton';
 import {
   Home, BarChart3, TrendingUp, FileText, Coins, Users, Shield,
-  Sparkles, Menu, X, ChevronDown, Zap, Moon, Sun
+  Sparkles, Menu, X, ChevronDown, Zap, Moon, Sun, Clock
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { TabId } from '../../types/index';
@@ -66,6 +66,12 @@ export function Navigation({
       label: 'NFT Gallery',
       shortLabel: 'NFT',
       icon: Sparkles,
+    },
+    {
+      id: 'history' as TabId,
+      label: 'Transaction History',
+      shortLabel: 'History',
+      icon: Clock,
     },
   ];
 
@@ -437,6 +443,12 @@ export function Navigation({
                 <div className="bg-pink-500/10 px-3 py-1.5 rounded-xl border border-pink-200/50">
                   <span className="hidden sm:inline">NFT Invoice Gallery</span>
                   <span className="sm:hidden">NFT Gallery</span>
+                </div>
+              )}
+              {activeTab === 'history' && (
+                <div className="bg-blue-500/10 px-3 py-1.5 rounded-xl border border-blue-200/50">
+                  <span className="hidden sm:inline">Transaction History</span>
+                  <span className="sm:hidden">History</span>
                 </div>
               )}
             </div>

@@ -1,12 +1,10 @@
 // src/App.tsx - Complete EarnX App with Para Integration
 import React, { useState, useEffect } from 'react';
-// @ts-ignore
+// @ts-ignore - wagmi v2 type definitions issue
 import { WagmiProvider } from 'wagmi';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { config } from './wagmi';
-import { ParaWalletProvider } from './components/wallet/ParaWalletProvider';
-import { HybridParaProvider } from './components/wallet/HybridParaProvider';
 import { ParaWalletInfo } from './components/wallet/ParaWalletInfo';
 import { ParaWalletConnectKitProvider } from './components/wallet/ParaWalletConnectKit';
 import './styles/premium-animations.css';
@@ -19,12 +17,11 @@ import  InvestPage  from './components/pages/InvestPage';
 import { SubmitInvoice } from './components/pages/SubmitInvoice';
 import { ParaIntegrationTest } from './components/test/ParaIntegrationTest';
 import { NFTInvoiceGallery } from './components/NFTInvoiceGallery';
+import TransactionHistory from './components/pages/TransactionHistory';
 
 import { VideoModal } from './components/ui/VideoModal';
-import { useEarnX } from './hooks/useEarnX';
-import { useInvestmentCommittee } from './hooks/useInvestmentCommittee';
+import { TransactionNotificationManager } from './components/ui/TransactionNotification';
 import { ThemeProvider } from './context/ThemeContext';
-// import { useNFTInvoiceSystem } from './hooks/useNFTIvoiceSystem';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,6 +61,7 @@ const PATH_TO_TAB: Record<string, TabId> = {
   '/nft-marketplace': 'nft-marketplace',
   '/committee': 'committee',
   '/para-test': 'para-test',
+  '/history': 'history',
 };
 
 // Map tab IDs to URL paths
@@ -75,6 +73,7 @@ const TAB_TO_PATH: Record<TabId, string> = {
   'nft-marketplace': '/nft-marketplace',
   'committee': '/committee',
   'para-test': '/para-test',
+  'history': '/history',
 };
 
 function AppContent() {
@@ -88,10 +87,8 @@ function AppContent() {
 
   const [showVideo, setShowVideo] = useState<boolean>(false);
 
-  // Hooks for blockchain integration
-  const { isConnected, submitInvoice, loading } = useEarnX();
-  // const { isCommitteeMember, committeeRole } = useInvestmentCommittee();
-  // const { getNFTStats } = useNFTInvoiceSystem();
+  // Hooks for blockchain integration available if needed
+  // const { isConnected } = useEarnX();
 
   // Sync tab changes with URL
   const handleTabChange = (newTab: TabId) => {
@@ -179,8 +176,13 @@ function AppContent() {
           <ParaIntegrationTest />
         )}
 
+
         {activeTab === 'nft-marketplace' && (
           <NFTInvoiceGallery />
+        )}
+
+        {activeTab === 'history' && (
+          <TransactionHistory />
         )}
 
         
@@ -211,7 +213,9 @@ function App() {
     return (
       <ParaWalletConnectKitProvider>
         <ThemeProvider>
-          <AppContent />
+          <TransactionNotificationManager>
+            <AppContent />
+          </TransactionNotificationManager>
         </ThemeProvider>
       </ParaWalletConnectKitProvider>
     );
@@ -224,7 +228,9 @@ function App() {
       <WagmiProvider config={config}>
         <RainbowKitProvider>
           <ThemeProvider>
-            <AppContent />
+            <TransactionNotificationManager>
+              <AppContent />
+            </TransactionNotificationManager>
           </ThemeProvider>
         </RainbowKitProvider>
       </WagmiProvider>

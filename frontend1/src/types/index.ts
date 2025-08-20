@@ -2,7 +2,7 @@
 import { LucideIcon } from 'lucide-react';
 
 // ===== NAVIGATION & UI TYPES =====
-export type TabId = 'home' | 'dashboard' | 'invest' | 'submit' | 'nft-marketplace' | 'committee' | 'para-test';
+export type TabId = 'home' | 'dashboard' | 'invest' | 'submit' | 'nft-marketplace' | 'committee' | 'para-test' | 'history';
 
 // ===== LEGACY INVOICE TYPES (for backwards compatibility) =====
 export interface Invoice {

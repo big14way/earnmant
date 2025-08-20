@@ -7,6 +7,8 @@ import {
   Users, Activity
 } from 'lucide-react';
 import { useEarnX } from '../../hooks/useEarnX';
+import { useMarketData } from '../../hooks/useMarketData';
+import { LiveMarketData } from '../ui/LiveMarketData';
 import { TabId } from '../../types/index';
 
 interface DashboardProps {
@@ -163,6 +165,9 @@ export function Dashboard({ setActiveTab }: DashboardProps) {
     getVerificationData,   // New: Get verification data from your proven module
     getInvestmentOpportunities,
   } = useEarnX();
+
+  // Enhanced market data with Chainlink integration
+  const enhancedMarketData = useMarketData();
 
   const { notifications, addNotification, removeNotification, clearAllNotifications } = useNotifications();
   const { displayAddress, showFull, setShowFull, copyAddress, copied } = useAddressDisplay(address);
@@ -780,82 +785,12 @@ export function Dashboard({ setActiveTab }: DashboardProps) {
         </div>
       </div>
 
-      {/* Enhanced Oracle Data Section */}
-      <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <Zap className="w-6 h-6 text-yellow-500" />
-            Live Oracle Data
-            <div className={`w-2 h-2 rounded-full animate-pulse ${
-              liveMarketData?.initialPricesFetched ? 'bg-green-400' : 'bg-orange-400'
-            }`}></div>
-            <span className="text-sm font-normal text-gray-500">
-              ({liveMarketData?.initialPricesFetched ? 'Live from oracles' : 'Using defaults'})
-            </span>
-          </h2>
-          
-          <div className="flex gap-2">
-            {/* Price update removed for simplified integration */}
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 text-center">
-            <div className="text-4xl mb-2">⚡</div>
-            <p className="text-sm text-gray-600 mb-1">ETH/USD</p>
-            <p className="text-2xl font-bold text-gray-900">${(liveMarketData?.ethPrice || 0).toFixed(2)}</p>
-            <p className="text-xs text-green-600">Live oracle feed</p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 text-center">
-            <div className="text-4xl mb-2">💵</div>
-            <p className="text-sm text-gray-600 mb-1">USDC/USD</p>
-            <p className="text-2xl font-bold text-gray-900">${(liveMarketData?.usdcPrice || 1).toFixed(4)}</p>
-            <p className="text-xs text-green-600">Stable oracle</p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 text-center">
-            <div className="text-4xl mb-2">₿</div>
-            <p className="text-sm text-gray-600 mb-1">BTC/USD</p>
-            <p className="text-2xl font-bold text-gray-900">${(liveMarketData?.btcPrice || 0).toLocaleString()}</p>
-            <p className="text-xs text-green-600">Bitcoin feed</p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 text-center">
-            <div className="text-4xl mb-2">🔗</div>
-            <p className="text-sm text-gray-600 mb-1">MNT/USD</p>
-            <p className="text-2xl font-bold text-gray-900">${(liveMarketData?.mntPrice || 0).toFixed(2)}</p>
-            <p className="text-xs text-green-600">Mantle token</p>
-          </div>
-        </div>
-
-        {/* Market Volatility and Oracle Status */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 text-center">
-            <p className="text-sm text-gray-600 mb-1">Market Volatility</p>
-            <p className="text-xl font-bold text-red-700">
-              {((liveMarketData?.marketVolatility || 0) * 100).toFixed(2)}%
-            </p>
-            <p className="text-xs text-red-600">Risk metric</p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center">
-            <p className="text-sm text-gray-600 mb-1">Last Oracle Update</p>
-            <p className="text-xl font-bold text-blue-700">
-              {new Date((liveMarketData?.lastUpdate || 0) * 1000).toLocaleTimeString()}
-            </p>
-            <p className="text-xs text-blue-600">Timestamp</p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center">
-            <p className="text-sm text-gray-600 mb-1">Oracle Status</p>
-            <p className={`text-xl font-bold ${liveMarketData?.initialPricesFetched ? 'text-green-700' : 'text-orange-700'}`}>
-              {liveMarketData?.initialPricesFetched ? 'LIVE' : 'DEFAULT'}
-            </p>
-            <p className="text-xs text-green-600">Oracle feeds</p>
-          </div>
-        </div>
-      </div>
+      {/* Enhanced Live Oracle Data with Chainlink Integration */}
+      <LiveMarketData 
+        marketData={enhancedMarketData}
+        loading={enhancedMarketData.isLoadingPrices}
+        error={enhancedMarketData.chainlinkError}
+      />
 
       {/* Enhanced Contract Verification Section */}
       <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
