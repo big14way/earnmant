@@ -430,12 +430,12 @@ export function Dashboard({ setActiveTab }: DashboardProps) {
         <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
           <span className="block">Connect Your</span>
           <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent">
-            Premium Wallet
+             Wallet
           </span>
         </h2>
         
         <p className="text-2xl text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-          Unlock your EarnX Protocol dashboard with live Mantle blockchain data and premium oracle integration.
+          Unlock your EarnX Protocol dashboard with live Mantle blockchain data and Chainlink oracle integration.
         </p>
         
         <div className="relative max-w-lg mx-auto">

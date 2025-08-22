@@ -1,12 +1,9 @@
 // src/components/layout/Navigation.tsx - Premium Glassmorphism Navigation
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { ParaConnectButton } from '../wallet/ParaConnectButton';
-import { HybridParaConnectButton } from '../wallet/HybridParaConnectButton';
-import { ParaWalletConnectKitButton } from '../wallet/ParaWalletConnectKitButton';
 import {
-  Home, BarChart3, TrendingUp, FileText, Coins, Users, Shield,
-  Sparkles, Menu, X, ChevronDown, Zap, Moon, Sun, Clock
+  Home, BarChart3, TrendingUp, FileText, Shield,
+  Sparkles, Menu, X, Zap, Moon, Sun, Clock
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { TabId } from '../../types/index';
@@ -123,7 +120,7 @@ export function Navigation({
           {/* Premium Navigation Tabs */}
           <div className="hidden sm:flex items-center justify-center flex-1 mx-6">
             <div className="flex items-center bg-white/60 backdrop-blur-md rounded-2xl p-1.5 border border-white/20 shadow-lg shadow-black/5">
-              {navigationItems.map((item, index) => {
+              {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 
@@ -194,24 +191,9 @@ export function Navigation({
               </div>
             )}
 
-            {/* Wallet Connect - Responsive */}
+            {/* RainbowKit Wallet Connect */}
             <div className="min-w-0">
-              {/* Feature flag for Para vs RainbowKit */}
-              {(() => {
-                if (process.env.REACT_APP_USE_PARA_WALLET === 'true') {
-                  console.log('🔗 Using Para WalletConnect Kit');
-                  return (
-                    <div className="flex items-center space-x-3">
-                      <div className="px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
-                        Para Mode
-                      </div>
-                      <ParaWalletConnectKitButton />
-                    </div>
-                  );
-                } else {
-                  console.log('🌈 Using RainbowKit Connect Button');
-                  return (
-                <ConnectButton.Custom>
+              <ConnectButton.Custom>
                 {({
                   account,
                   chain,
@@ -258,17 +240,19 @@ export function Navigation({
                               className="relative group bg-gradient-to-r from-red-500 to-red-600 text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 rounded-2xl font-bold hover:shadow-xl hover:shadow-red-500/25 transition-all duration-300 text-xs sm:text-sm whitespace-nowrap transform hover:scale-105"
                             >
                               <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                              <span className="relative">Wrong Network</span>
+                              <div className="relative flex items-center gap-2">
+                                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                                <span>Wrong Network</span>
+                              </div>
                             </button>
                           );
                         }
 
                         return (
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            {/* Premium Chain Button */}
+                          <div className="flex gap-3">
                             <button
                               onClick={openChainModal}
-                              className="hidden lg:flex bg-white/60 backdrop-blur-md text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-white/80 hover:shadow-lg transition-all duration-300 items-center gap-2 border border-white/20"
+                              className="flex items-center bg-white/60 backdrop-blur-md text-gray-900 px-3 py-2 rounded-xl border border-white/20 text-xs font-semibold hover:bg-white/80 transition-all duration-300"
                             >
                               {chain.hasIcon && (
                                 <div
@@ -278,6 +262,7 @@ export function Navigation({
                                     height: 16,
                                     borderRadius: 999,
                                     overflow: 'hidden',
+                                    marginRight: 6,
                                   }}
                                 >
                                   {chain.iconUrl && (
@@ -289,26 +274,20 @@ export function Navigation({
                                   )}
                                 </div>
                               )}
-                              <span className="hidden xl:inline">{chain.name}</span>
-                              <span className="xl:hidden">{chain.name?.slice(0, 6)}</span>
+                              {chain.name}
                             </button>
 
-                            {/* Premium Account Button */}
                             <button
                               onClick={openAccountModal}
-                              className="relative group bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-600 text-white px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 rounded-2xl font-semibold hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 text-xs sm:text-sm lg:text-base min-w-0 transform hover:scale-105 overflow-hidden"
+                              className="relative group bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 rounded-2xl font-bold hover:shadow-xl hover:shadow-green-500/25 transition-all duration-300 text-xs sm:text-sm whitespace-nowrap transform hover:scale-105"
                             >
-                              <div className="absolute inset-0 bg-gradient-to-r from-blue-700 via-purple-700 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              <div className="absolute inset-0 bg-gradient-to-r from-green-700 via-emerald-700 to-teal-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                               <div className="relative flex items-center gap-2">
                                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                                <span className="hidden lg:inline truncate">
-                                  {account.displayName}
-                                  {account.displayBalance ? ` (${account.displayBalance})` : ''}
-                                </span>
-                                <span className="hidden sm:inline lg:hidden truncate">
+                                <span className="hidden sm:inline">
                                   {account.displayName}
                                 </span>
-                                <span className="sm:hidden truncate">
+                                <span className="sm:hidden">
                                   {account.displayName?.slice(0, 4)}...
                                 </span>
                               </div>
@@ -320,9 +299,6 @@ export function Navigation({
                   );
                 }}
               </ConnectButton.Custom>
-                  );
-                }
-              })()}
             </div>
 
             {/* Premium Mobile Menu Button */}

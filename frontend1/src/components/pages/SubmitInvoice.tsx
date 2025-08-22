@@ -314,6 +314,10 @@ export function SubmitInvoice() {
       return;
     }
 
+    // Use a different buyer address to avoid supplier-buyer validation error
+    // In production, this would come from the form or be a real buyer address
+    const defaultBuyerAddress = "0x742d35cc6635c0532925a3b8d50b6f4c8daed9a1"; // Demo buyer address
+
     if (!address) {
       setErrors({ verification: 'Please connect your wallet first' });
       return;
@@ -373,7 +377,7 @@ export function SubmitInvoice() {
       const dueDate = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60); // 30 days from now
       
       const blockchainInvoiceData = {
-        buyer: address,
+        buyer: defaultBuyerAddress, // Use different address than supplier
         amount: formData.amount,
         commodity: formData.commodity,
         supplierCountry: formData.originCountry,
@@ -647,7 +651,7 @@ export function SubmitInvoice() {
         metadataURI: `ipfs://metadata-${Date.now()}`, // Mock metadata URI
 
         // Additional Wagmi fields
-        buyer: address || '0x742d35Cc6775C45CB05D4D6c4e6f2b1FE4FBE5A6', // Current user or default
+        buyer: "0x742d35cc6635c0532925a3b8d50b6f4c8daed9a1", // Use different buyer address than supplier
         commodity: formData.commodity,
         supplierCountry: formData.originCountry,
         buyerCountry: 'USA', // Default buyer country

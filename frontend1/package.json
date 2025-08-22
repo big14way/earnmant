@@ -3,10 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cosmjs/amino": "^0.36.0",
+    "@cosmjs/cosmwasm-stargate": "^0.36.0",
+    "@cosmjs/encoding": "^0.36.0",
+    "@cosmjs/proto-signing": "^0.36.0",
+    "@cosmjs/stargate": "^0.36.0",
+    "@cosmjs/tendermint-rpc": "^0.36.0",
     "@getpara/evm-wallet-connectors": "^2.0.0-alpha.45",
-    "@getpara/react-sdk": "^2.0.0-alpha.45",
-    "@rainbow-me/rainbowkit": "^2.2.6",
-    "@tanstack/react-query": "^5.85.3",
+    "@getpara/graz": "^0.1.0",
+    "@getpara/react-sdk": "2.0.0-alpha.48",
+    "@rainbow-me/rainbowkit": "^2.2.8",
+    "@solana-mobile/wallet-adapter-mobile": "^2.2.3",
+    "@solana/wallet-adapter-react": "^0.15.39",
+    "@tanstack/react-query": "5.85.5",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -20,6 +29,7 @@
     "@web3modal/ethereum": "2.7.1",
     "@web3modal/ethers5": "3.4.0",
     "buffer": "^6.0.3",
+    "cosmjs-types": "^0.10.1",
     "crypto-browserify": "^3.12.1",
     "ethers": "^5.7.2",
     "lucide-react": "^0.513.0",
@@ -28,8 +38,8 @@
     "react-dom": "^19.1.0",
     "react-scripts": "5.0.1",
     "stream-browserify": "^3.0.0",
-    "viem": "^2.21.19",
-    "wagmi": "^2.15.6",
+    "viem": "^2.34.0",
+    "wagmi": "^2.16.4",
     "web-vitals": "^2.1.4",
     "web3modal": "1.9.12"
   },
@@ -68,6 +78,7 @@
     "postcss": "^8.4.31",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vm-browserify": "^1.1.2"
   }
 }

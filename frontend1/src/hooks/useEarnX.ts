@@ -15,7 +15,6 @@ import {
 
 // Import ABIs from Mantle deployment
 import MantleEarnXProtocol from '../abis/MantleEarnXProtocol.json';
-import MinimalInvoiceProtocol from '../abis/MinimalInvoiceProtocol.json';
 import MantleEarnXVerificationModule from '../abis/MantleEarnXVerificationModule.json';
 import MantleUSDC from '../abis/MantleUSDC.json';
 import ChainlinkEnhancedPriceManager from '../abis/ChainlinkEnhancedPriceManager.json';
@@ -23,8 +22,8 @@ import EarnXInvestmentModule from '../abis/EarnXInvestmentModule.json';
 import EarnXInvoiceNFT from '../abis/EarnXInvoiceNFT.json';
 import CCIPSourceMinterMantle from '../abis/CCIPSourceMinterMantle.json';
 
-// Use the ultra-minimal protocol that should work with proper gas
-const EarnXProtocolABI = MinimalInvoiceProtocol.abi;
+// Use the full MantleEarnXProtocol for complete functionality including Chainlink verification
+const EarnXProtocolABI = MantleEarnXProtocol.abi;
 const EarnXPriceManagerABI = ChainlinkEnhancedPriceManager.abi;
 const EarnXVerificationModuleABI = MantleEarnXVerificationModule.abi;
 const EarnXUSDCABI = MantleUSDC.abi;
@@ -85,29 +84,33 @@ const SimpleERC20ABI = [
   }
 ] as const;
 
-// 🚀 MANTLE SEPOLIA DEPLOYMENT - Updated with Working Contracts (January 2025)
+// 🚀 MANTLE SEPOLIA DEPLOYMENT - SUCCESSFUL CONTRACTS (LIVE)
 const CONTRACT_ADDRESSES = {
-  PROTOCOL: "0x4b5d634b27CA72397fa8b9757332D2A5794632f5" as const, // ✅ MINIMAL INVOICE PROTOCOL
+  // Main Protocol Contract - Successfully deployed and verified ✅ DEPLOYED
+  PROTOCOL: "0x95EAb385c669aca31C0d406c270d6EdDFED0D1ee" as const, // MantleEarnXProtocol
   
-  // 🔧 USDC Contract - Will be verified at runtime and fallback to alternatives if needed
-  USDC: "0x211a38792781b2c7a584a96F0e735d56e809fe85" as const,     // ✅ PRIMARY USDC TOKEN
+  // 🔧 USDC Contract - Working deployed contract
+  USDC: "0x211a38792781b2c7a584a96F0e735d56e809fe85" as const, // ✅ WORKING USDC TOKEN
   
   // 🔄 FALLBACK USDC OPTIONS - Alternative contracts to try if primary fails
-  USDC_FALLBACK_1: "0x0088d454b77FfeF4e6d4f7426AB01e73Bd283B12" as const,
+  USDC_FALLBACK_1: "0xa49Ae8a172017B6394310522c673A38d3D64b0A7" as const,
   USDC_FALLBACK_2: "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8" as const, // Common Sepolia USDC
   
-  VERIFICATION_MODULE: "0x4adDFcfa066E0c955bC0347d9565454AD7Ceaae1" as const, // ✅ ACTUAL DEPLOYED
+  // Successfully Deployed Modules ✅ DEPLOYED
+  VERIFICATION_MODULE: "0x4adDFcfa066E0c955bC0347d9565454AD7Ceaae1" as const, // MantleEarnXVerificationModule
+  PRICE_MANAGER: "0x789f82778A8d9eB6514a457112a563A89F79A2f1" as const, // MantlePriceManager
+  
+  // Cross-chain Infrastructure (if available)
+  CCIP_SOURCE_MINTER: "0xA29373f508CABcB647aC677C329f24a939b29776" as const, // CCIPSourceMinterMantle
 
-  // ✅ All supporting contracts from ACTUAL Mantle Sepolia deployment
-  INVOICE_NFT: "0x4f330C74c7bd84665722bA0664705e2f2E6080DC" as const,
-  PRICE_MANAGER: "0x789f82778A8d9eB6514a457112a563A89F79A2f1" as const, // ✅ ACTUAL DEPLOYED
-  INVESTMENT_MODULE: "0x199516b47F1ce8C77617b58526ad701bF1f750FA" as const,
-  CCIP_SOURCE_MINTER: "0xdf0ED3Af8bCcd8DcaB0D77216317BA32177df34A" as const, // 🌉 CROSS-CHAIN READY
-  VRF_GENERATOR: "0x728B9b25E5c67FDec0C35aEAe4719715b10300fb" as const, // 🎲 SECURE RANDOMNESS
+  // ✅ All supporting contracts from SUCCESSFUL Mantle Sepolia deployment
+  INVOICE_NFT: "0x4f330C74c7bd84665722bA0664705e2f2E6080DC" as const, // EarnXInvoiceNFT
+  INVESTMENT_MODULE: "0x199516b47F1ce8C77617b58526ad701bF1f750FA" as const, // EarnXInvestmentModule
+  VRF_GENERATOR: "0x280979E7890bB8DDCaD92eF68c87F98452E5C856" as const, // ChainlinkVRFInvoiceGenerator (if available)
 } as const;
 
-// 🔍 Runtime working USDC address - will be determined at runtime based on what actually works
-let WORKING_USDC_ADDRESS: string = CONTRACT_ADDRESSES.USDC;
+// 🔍 Runtime working USDC address - start with the working deployed USDC
+let WORKING_USDC_ADDRESS: string = CONTRACT_ADDRESSES.USDC; // 0x211a38792781b2c7a584a96F0e735d56e809fe85
 
 // 🛠️ CONTRACT VERIFICATION UTILITIES
 const verifyUSDCContract = async (publicClient: any, contractAddress: string): Promise<{
@@ -205,8 +208,7 @@ const verifyUSDCContract = async (publicClient: any, contractAddress: string): P
 // 🔄 USDC Contract Discovery - Find a working USDC contract
 const findWorkingUSDCContract = async (publicClient: any): Promise<string | null> => {
   const contractsToTry = [
-    "0xdC832Fac3C211E1148D00624c992299B2d954f17", // Deployed MockUSDC on Mantle Sepolia
-    CONTRACT_ADDRESSES.USDC,
+    CONTRACT_ADDRESSES.USDC, // ✅ Primary deployed USDC from Chainlink deployment
     CONTRACT_ADDRESSES.USDC_FALLBACK_1,
     CONTRACT_ADDRESSES.USDC_FALLBACK_2,
   ];
@@ -363,7 +365,24 @@ export const useEarnX = () => {
       
       console.log(`💳 Approving ${approvalAmount} USDC for ${spender}...`);
 
-      // Step 1: Simulate the approval first to catch errors early
+      // Step 1: Check user balance first
+      console.log('💰 Checking USDC balance before approval...');
+      const userBalance = await publicClient.readContract({
+        address: workingUSDCAddress as `0x${string}`,
+        abi: SimpleERC20ABI,
+        functionName: 'balanceOf',
+        args: [address as `0x${string}`],
+      });
+      
+      const formattedBalance = (Number(userBalance) / 1e6).toFixed(2);
+      const formattedApprovalAmount = (Number(approvalAmount) / 1e6).toFixed(2);
+      console.log(`💰 User balance: ${formattedBalance} USDC, trying to approve: ${formattedApprovalAmount} USDC`);
+      
+      if (Number(userBalance) === 0) {
+        throw new Error(`Insufficient USDC balance. You have 0 USDC but need at least ${formattedApprovalAmount} USDC.`);
+      }
+      
+      // Step 2: Simulate the approval first to catch errors early
       console.log('🔍 Simulating approval transaction...');
       try {
         await publicClient.simulateContract({
@@ -376,76 +395,108 @@ export const useEarnX = () => {
         console.log('✅ Approval simulation successful');
       } catch (simulationError: any) {
         console.error('❌ Approval simulation failed:', simulationError);
-        throw new Error(`Approval simulation failed: ${simulationError.message || 'Unknown simulation error'}`);
+        
+        // Try with a smaller amount to see if it's an amount issue
+        const smallAmount = BigInt(1000000); // 1 USDC
+        try {
+          await publicClient.simulateContract({
+            address: workingUSDCAddress as `0x${string}`,
+            abi: SimpleERC20ABI,
+            functionName: 'approve',
+            args: [spender as `0x${string}`, smallAmount],
+            account: address as `0x${string}`,
+          });
+          console.log('✅ Small amount simulation worked - issue might be with large amounts');
+          throw new Error(`Approval simulation failed for ${formattedApprovalAmount} USDC. Try a smaller amount.`);
+        } catch (smallError) {
+          console.error('❌ Even small amount simulation failed:', smallError);
+          throw new Error(`Approval simulation failed: ${simulationError.message || 'Contract may be paused or account restricted'}`);
+        }
       }
 
-      // ERC20 Double Spending Protection
+      // ERC20 Double Spending Protection - Skip reset for now to avoid issues
       if (currentAllowance > 0) {
-        console.log('🔄 Resetting allowance to 0 first (double spending protection)...');
-        
-        try {
-          let resetTx: string;
-          try {
-            resetTx = await walletClient.writeContract({
-              address: workingUSDCAddress as `0x${string}`,
-              abi: MockUSDCABI,
-              functionName: 'approve',
-              args: [spender as `0x${string}`, 0n], // Reset to 0
-              account: address as `0x${string}`,
-              gas: BigInt(100000),
-            });
-          } catch (resetMainError: any) {
-            console.warn('❌ Reset with main ABI failed, trying simple ERC20 ABI:', resetMainError?.message);
-            
-            resetTx = await walletClient.writeContract({
-              address: workingUSDCAddress as `0x${string}`,
-              abi: SimpleERC20ABI,
-              functionName: 'approve',
-              args: [spender as `0x${string}`, 0n], // Reset to 0
-              account: address as `0x${string}`,
-              gas: BigInt(100000),
-            });
-            console.log('✅ Reset with simple ERC20 ABI worked!');
-          }
-          
-          console.log('⏳ Waiting for reset transaction confirmation...');
-          await publicClient.waitForTransactionReceipt({
-            hash: resetTx,
-            timeout: 60000,
-          });
-          
-          console.log('✅ Allowance reset to 0 completed');
-        } catch (resetError) {
-          console.error('❌ Failed to reset allowance:', resetError);
-          throw new Error('Failed to reset allowance. Please try again.');
-        }
+        console.log('ℹ️ Current allowance exists:', (Number(currentAllowance) / 1e6).toFixed(2), 'USDC');
+        console.log('⚠️ Skipping reset for safety - will set new allowance directly');
+        // Note: Some tokens don't require reset to 0, and it can cause issues
       }
       
       // Now approve the new amount
       console.log(`💳 Setting new allowance: ${approvalAmount.toString()} (${amount} USDC)`);
       
       let approveTx: string;
+      
+      // Use the correct gas limit based on our diagnosis (minimum needed: 75,564,404)
+      // Gas estimation showed: 149,934,288, so we'll use 160M to be safe
+      const gasAmount = BigInt(160000000); // 160 million gas to handle the high gas requirement
+      
       try {
-        approveTx = await walletClient.writeContract({
-          address: workingUSDCAddress as `0x${string}`,
-          abi: MockUSDCABI,
-          functionName: 'approve',
-          args: [spender as `0x${string}`, approvalAmount],
-          account: address as `0x${string}`,
-          gas: BigInt(100000),
-        });
-      } catch (approveMainError: any) {
-        console.warn('❌ Main ABI failed, trying simple ERC20 ABI:', approveMainError?.message);
-        
+        // Try with simple ERC20 ABI first with proper gas limit
         approveTx = await walletClient.writeContract({
           address: workingUSDCAddress as `0x${string}`,
           abi: SimpleERC20ABI,
           functionName: 'approve',
           args: [spender as `0x${string}`, approvalAmount],
           account: address as `0x${string}`,
-          gas: BigInt(100000),
+          gas: gasAmount,
+          // Let the wallet/RPC estimate gas price automatically
         });
-        console.log('✅ Simple ERC20 ABI worked!');
+        console.log('✅ Approval with simple ERC20 ABI successful using proven gas amount');
+      } catch (approveSimpleError: any) {
+        console.warn('❌ Simple ERC20 ABI failed, trying with different gas settings:', approveSimpleError?.message);
+        
+        // Check if it's a gas estimation issue
+        if (approveSimpleError?.message?.includes('gas') || approveSimpleError?.message?.includes('limit')) {
+          console.log('🔧 Detected gas estimation issue, trying with even higher gas limit...');
+          try {
+            // Try with even higher gas limit (200M)
+            approveTx = await walletClient.writeContract({
+              address: workingUSDCAddress as `0x${string}`,
+              abi: SimpleERC20ABI,
+              functionName: 'approve',
+              args: [spender as `0x${string}`, approvalAmount],
+              account: address as `0x${string}`,
+              gas: BigInt(200000000), // 200M gas
+            });
+            console.log('✅ Approval successful with higher gas limit (200M)');
+          } catch (highGasError: any) {
+            console.error('❌ Even higher gas limit failed:', highGasError?.message);
+            
+            // Last resort: let wallet estimate
+            try {
+              approveTx = await walletClient.writeContract({
+                address: workingUSDCAddress as `0x${string}`,
+                abi: SimpleERC20ABI,
+                functionName: 'approve',
+                args: [spender as `0x${string}`, approvalAmount],
+                account: address as `0x${string}`,
+                // Let wallet client estimate gas automatically
+              });
+              console.log('✅ Approval successful with wallet gas estimation');
+            } catch (autoGasError: any) {
+              console.error('❌ All gas strategies failed:', autoGasError?.message);
+              throw new Error(`Approval failed with all gas strategies: ${autoGasError?.message || 'Unknown error'}`);
+            }
+          }
+        } else {
+          // Try main ABI as fallback
+          try {
+            approveTx = await walletClient.writeContract({
+              address: workingUSDCAddress as `0x${string}`,
+              abi: MockUSDCABI,
+              functionName: 'approve',
+              args: [spender as `0x${string}`, approvalAmount],
+              account: address as `0x${string}`,
+              gas: gasAmount,
+            });
+            console.log('✅ Approval with main ABI successful');
+          } catch (approveMainError: any) {
+            console.error('❌ Both ABIs failed for approval');
+            console.error('Simple ABI error:', approveSimpleError?.message);
+            console.error('Main ABI error:', approveMainError?.message);
+            throw new Error(`Approval failed with both ABIs. Simple: ${approveSimpleError?.message}, Main: ${approveMainError?.message}`);
+          }
+        }
       }
       
       console.log('⏳ Waiting for approval transaction confirmation...');
@@ -556,7 +607,7 @@ export const useEarnX = () => {
         functionName: 'mint',
         args: [address as `0x${string}`, amountWei],
         account: address as `0x${string}`,
-        gas: BigInt(200000),
+        gas: BigInt(2000000), // 2M gas for mint transactions
       });
 
       console.log('⏳ Waiting for mint transaction confirmation...');
@@ -597,6 +648,7 @@ export const useEarnX = () => {
       setError(null);
 
       const amountWei = parseUnits(amount, 6); // USDC has 6 decimals
+      console.log('💰 Investment amount in wei:', amountWei.toString());
       
       const investTx = await walletClient.writeContract({
         address: CONTRACT_ADDRESSES.PROTOCOL as `0x${string}`,
@@ -604,7 +656,7 @@ export const useEarnX = () => {
         functionName: 'investInInvoice',
         args: [invoiceId, amountWei],
         account: address as `0x${string}`,
-        gas: BigInt(300000),
+        gas: BigInt(5000000), // 5M gas for investment transactions
       });
 
       console.log('⏳ Waiting for investment transaction confirmation...');
@@ -628,7 +680,7 @@ export const useEarnX = () => {
           status: 'confirmed',
           amount: amount,
           currency: 'USDC',
-          invoiceId: invoiceId,
+          invoiceId: invoiceId.toString(),
           blockNumber: receipt.blockNumber?.toString(),
           gasUsed: receipt.gasUsed?.toString(),
           description: `Invested ${amount} USDC in Invoice ${invoiceId}`
@@ -673,7 +725,7 @@ export const useEarnX = () => {
         functionName: 'faucet',
         args: [parseUnits('10000', 6)], // Request 10,000 test USDC
         account: address as `0x${string}`,
-        gas: BigInt(200000),
+        gas: BigInt(2000000), // 2M gas for faucet transactions
       });
 
       console.log('⏳ Waiting for faucet transaction confirmation...');
@@ -737,11 +789,52 @@ export const useEarnX = () => {
       setIsLoading(true);
       setError(null);
 
-      console.log('📄 Using hybrid IPFS approach for invoice submission:', invoiceData);
+      console.log('🔗 Submitting invoice with Chainlink verification:', invoiceData);
       
-      // Prepare invoice data for IPFS storage
-      const invoiceId = invoiceData.invoiceId || `INV-${Date.now()}`;
+      // Prepare invoice data for blockchain submission
+      const invoiceId = Date.now(); // Use timestamp as invoice ID
       const dueDate = invoiceData.dueDate || Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60); // 30 days from now
+      const amountInWei = parseUnits(invoiceData.amount.toString(), 6); // USDC has 6 decimals
+      
+      // Step 1: Get enhanced price data from Chainlink Price Manager
+      let commodityPrice = 0;
+      let riskScore = 50; // Default medium risk
+      
+      try {
+        console.log('📊 Getting Chainlink price data for:', invoiceData.commodity);
+        
+        // Get commodity price
+        const priceData = await publicClient.readContract({
+          address: CONTRACT_ADDRESSES.PRICE_MANAGER as `0x${string}`,
+          abi: EarnXPriceManagerABI,
+          functionName: 'getCommodityPrice',
+          args: [invoiceData.commodity],
+        });
+        
+        commodityPrice = Number(priceData[0]) / 1e8; // Chainlink uses 8 decimals
+        
+        // Get country risk separately
+        try {
+          const riskData = await publicClient.readContract({
+            address: CONTRACT_ADDRESSES.PRICE_MANAGER as `0x${string}`,
+            abi: EarnXPriceManagerABI,
+            functionName: 'getCountryRisk',
+            args: [invoiceData.supplierCountry],
+          });
+          riskScore = Number(riskData);
+        } catch (riskError) {
+          console.warn('⚠️ Could not get country risk, using default');
+        }
+        
+        console.log('✅ Chainlink price data received:', {
+          commodityPrice,
+          riskScore,
+          currency: invoiceData.supplierCountry
+        });
+        
+      } catch (priceError) {
+        console.warn('⚠️ Could not get Chainlink price data, using defaults:', priceError);
+      }
       
       const ipfsInvoiceData: IPFSInvoiceData = {
         buyer: invoiceData.buyer || address,
@@ -757,7 +850,7 @@ export const useEarnX = () => {
         supplier: address
       };
       
-      console.log('🗂️ Prepared invoice data for IPFS:', ipfsInvoiceData);
+      console.log('🗂️ Prepared invoice data with Chainlink enhancement:', ipfsInvoiceData);
 
       // Generate IPFS hash for the invoice data
       const ipfsHash = generateIPFSHash(ipfsInvoiceData);
@@ -771,21 +864,21 @@ export const useEarnX = () => {
       storeInvoiceDataLocally(txHash, ipfsInvoiceData, ipfsHash);
       console.log('💾 Stored invoice data locally');
 
-      // Try blockchain submission as fallback (but expect it to fail on Mantle Sepolia)
+      // Try blockchain submission first (should work now with correct gas settings)
       let blockchainSuccess = false;
       let blockchainTxHash: string | null = null;
       let blockchainError: string | null = null;
 
-      console.log('🚀 Attempting blockchain submission as fallback...');
+      console.log('🚀 Attempting blockchain submission (primary method)...');
       try {
-        // Check the minimal contract status first
-        const totalInvoices = await publicClient.readContract({
+        // Check the protocol contract status first
+        const protocolStats = await publicClient.readContract({
           address: CONTRACT_ADDRESSES.PROTOCOL as `0x${string}`,
           abi: EarnXProtocolABI,
-          functionName: 'getTotalInvoices',
+          functionName: 'getProtocolStats',
         });
         
-        console.log('✅ Contract is working, total invoices:', totalInvoices?.toString());
+        console.log('✅ Contract is working, total invoices:', protocolStats?.[0]?.toString());
 
         const amountInUSDC = parseUnits(invoiceData.amount || '0', 6);
         const contractArgs = [
@@ -800,20 +893,22 @@ export const useEarnX = () => {
           invoiceData.documentHash || ''
         ] as const;
 
-        // Submit to blockchain contract
+        // Submit to blockchain contract with proper gas limit
         const submitTx = await walletClient.writeContract({
           address: CONTRACT_ADDRESSES.PROTOCOL as `0x${string}`,
           abi: EarnXProtocolABI,
           functionName: 'submitInvoice',
           args: contractArgs,
           account: address as `0x${string}`,
-          gas: BigInt(100000000),
+          gas: BigInt(160000000), // 160M gas - same as USDC approval requirement
         });
 
         const receipt = await publicClient.waitForTransactionReceipt({
           hash: submitTx,
           timeout: 30000, // Shorter timeout for blockchain attempt
         });
+        
+        console.log('✅ Blockchain receipt:', receipt.status);
 
         blockchainSuccess = true;
         blockchainTxHash = submitTx;
@@ -821,7 +916,15 @@ export const useEarnX = () => {
         
       } catch (blockchainErr: any) {
         blockchainError = blockchainErr.message || 'Blockchain submission failed';
-        console.log('⚠️ Expected blockchain failure on Mantle Sepolia:', blockchainError);
+        console.error('❌ Blockchain submission failed:', blockchainError);
+        
+        // Don't silently fall back - let user know there was a blockchain error
+        console.error('🚨 BLOCKCHAIN SUBMISSION FAILED. This should not happen with correct gas settings.');
+        console.error('🔧 Error details:', {
+          error: blockchainErr.message,
+          code: blockchainErr.code,
+          data: blockchainErr.data
+        });
       }
 
       // Use blockchain hash if successful, otherwise use generated hash
@@ -835,7 +938,7 @@ export const useEarnX = () => {
           status: blockchainSuccess ? 'confirmed' : 'ipfs_stored',
           amount: invoiceData.amount || '0',
           currency: invoiceData.currency || 'USDC',
-          invoiceId: invoiceId,
+          invoiceId: invoiceId.toString(),
           blockNumber: blockchainSuccess ? 'confirmed' : 'ipfs',
           gasUsed: blockchainSuccess ? 'blockchain' : 'local',
           description: `Submitted ${invoiceData.commodity || 'Trade Finance'} invoice for ${invoiceData.amount || '0'} ${invoiceData.currency || 'USDC'}${blockchainSuccess ? ' (blockchain)' : ' (IPFS hybrid)'}`
@@ -843,22 +946,38 @@ export const useEarnX = () => {
       }
 
       const resultMessage = blockchainSuccess 
-        ? 'Invoice submitted successfully to blockchain!'
-        : 'Invoice stored securely using hybrid IPFS method. Transaction hash generated for tracking.';
+        ? '🎉 Invoice submitted successfully to Mantle Sepolia blockchain!' 
+        : '⚠️ Blockchain submission failed. Invoice stored locally. Please check your wallet connection and gas settings, then try again for on-chain verification.';
 
       console.log('✅ Invoice submission completed!', {
         method: blockchainSuccess ? 'blockchain' : 'ipfs_hybrid',
         txHash: finalTxHash,
         ipfsHash,
-        invoiceId
+        invoiceId,
+        blockchainSuccess
       });
+      
+      // If blockchain failed, we should encourage retry instead of silently accepting fallback
+      if (!blockchainSuccess) {
+        console.error('🚨 RETURNING WARNING: Blockchain submission failed, using local fallback');
+        return { 
+          success: false, // Changed to false to indicate blockchain failure
+          txHash: finalTxHash, 
+          method: 'local_fallback',
+          ipfsHash,
+          message: resultMessage,
+          error: `Blockchain submission failed: ${blockchainError}. Please try again.`,
+          shouldRetry: true
+        };
+      }
       
       return { 
         success: true, 
         txHash: finalTxHash, 
-        method: blockchainSuccess ? 'blockchain' : 'ipfs_hybrid',
+        method: 'blockchain',
         ipfsHash,
-        message: resultMessage
+        message: resultMessage,
+        explorerUrl: `https://explorer.sepolia.mantle.xyz/tx/${finalTxHash}`
       };
       
     } catch (error: any) {

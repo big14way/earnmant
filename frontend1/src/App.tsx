@@ -1,12 +1,10 @@
-// src/App.tsx - Complete EarnX App with Para Integration
+// src/App.tsx - Complete EarnX App with RainbowKit Integration  
 import React, { useState, useEffect } from 'react';
 // @ts-ignore - wagmi v2 type definitions issue
 import { WagmiProvider } from 'wagmi';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { config } from './wagmi';
-import { ParaWalletInfo } from './components/wallet/ParaWalletInfo';
-import { ParaWalletConnectKitProvider } from './components/wallet/ParaWalletConnectKit';
 import './styles/premium-animations.css';
 import { TabId } from './types/index';
 import { Navigation } from './components/layout/Navigation';
@@ -15,7 +13,6 @@ import { LandingPage } from './components/pages/LandingPage';
 import { Dashboard } from './components/pages/Dashboard';
 import  InvestPage  from './components/pages/InvestPage';
 import { SubmitInvoice } from './components/pages/SubmitInvoice';
-import { ParaIntegrationTest } from './components/test/ParaIntegrationTest';
 import { NFTInvoiceGallery } from './components/NFTInvoiceGallery';
 import TransactionHistory from './components/pages/TransactionHistory';
 
@@ -140,12 +137,9 @@ function AppContent() {
       />
 
       <main className="relative max-w-7xl mx-auto px-6 pt-16">
+        
         {/* Para Wallet Info - Show when Para mode is enabled */}
-        {process.env.REACT_APP_USE_PARA_WALLET === 'true' && (
-          <div className="mb-8">
-            <ParaWalletInfo />
-          </div>
-        )}
+        {/* Para wallet integration is now active by default */}
 
         {activeTab === 'home' && (
           <LandingPage
@@ -172,9 +166,6 @@ function AppContent() {
           <SubmitInvoice />
         )}
 
-        {activeTab === 'para-test' && (
-          <ParaIntegrationTest />
-        )}
 
 
         {activeTab === 'nft-marketplace' && (
@@ -200,32 +191,12 @@ function AppContent() {
 }
 
 function App() {
-  // Feature flag for Para integration (can be controlled via env var)
-  const useParaWallet = process.env.REACT_APP_USE_PARA_WALLET === 'true';
+  console.log('🚀 EarnX App Starting with RainbowKit...');
 
-  console.log('🚀 EarnX App Starting...');
-  console.log('🔧 Para Wallet Enabled:', useParaWallet);
-  console.log('🔑 Para API Key:', process.env.REACT_APP_PARA_API_KEY?.substring(0, 10) + '...');
-
-  if (useParaWallet) {
-    console.log('✅ Using Para WalletConnect Kit');
-    // Para WalletConnect Kit integration - Official Para integration
-    return (
-      <ParaWalletConnectKitProvider>
-        <ThemeProvider>
-          <TransactionNotificationManager>
-            <AppContent />
-          </TransactionNotificationManager>
-        </ThemeProvider>
-      </ParaWalletConnectKitProvider>
-    );
-  }
-
-  console.log('🌈 Using RainbowKit Integration (Fallback)');
-  // Existing RainbowKit integration (fallback)
+  // Using RainbowKit for reliable wallet connections
   return (
-    <QueryClientProvider client={queryClient}>
-      <WagmiProvider config={config}>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
           <ThemeProvider>
             <TransactionNotificationManager>
@@ -233,8 +204,8 @@ function App() {
             </TransactionNotificationManager>
           </ThemeProvider>
         </RainbowKitProvider>
-      </WagmiProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 

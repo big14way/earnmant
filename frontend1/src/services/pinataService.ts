@@ -28,14 +28,14 @@ export class PinataService {
 
   constructor() {
     this.config = {
-      apiKey: process.env.REACT_APP_PINATA_API_KEY || 'a79da4d212f5c7612200',
-      apiSecret: process.env.REACT_APP_PINATA_API_SECRET || '5e15ead3e2276c845932bc53441bf8a58ab02c83fe71f0204b64dd87f47e2a5d',
-      jwt: process.env.REACT_APP_PINATA_JWT || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI0N2MzODlkOC05ZDRlLTQ0NWYtOGExMy02YTFiYzY1OTA5MTUiLCJlbWFpbCI6InNhbXVlbGFsZW9ub21vaDVAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiRlJBMSJ9LHsiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiTllDMSJ9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImE3OWRhNGQyMTJmNWM3NjEyMjAwIiwic2NvcGVkS2V5U2VjcmV0IjoiNWUxNWVhZDNlMjI3NmM4NDU5MzJiYzUzNDQxYmY4YTU4YWIwMmM4M2ZlNzFmMDIwNGI2NGRkODdmNDdlMmE1ZCIsImV4cCI6MTc4MTQ2NTM5OH0.xwXhtqHPTbhu_BQVDlvdFhH9rqKQNCKTzr7DhyuuFkQ',
+      apiKey: process.env.REACT_APP_PINATA_API_KEY || '',
+      apiSecret: process.env.REACT_APP_PINATA_API_SECRET || '',
+      jwt: process.env.REACT_APP_PINATA_JWT || '', // Disable default JWT - requires valid credentials
       gateway: process.env.REACT_APP_PINATA_GATEWAY || 'https://gateway.pinata.cloud'
     };
 
     if (!this.config.jwt) {
-      console.warn('Pinata JWT not configured. Using demo mode.');
+      console.log('ℹ️ Pinata JWT not configured. Using local IPFS hash generation only.');
     }
   }
 
